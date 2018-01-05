@@ -40,9 +40,10 @@ activity_by_day <- group_by(activity, date)
 steps_by_day <- summarise(activity_by_day, total=sum(steps))
 
 meansteps <- mean(steps_by_day$total)
+mediansteps <- median(steps_by_day$total)
 ```
 
-The mean number of steps per day is 10766.19
+The mean number of steps per day is 10766.19, and the median number of steps per day is 10765.
 
 
 ## What is the average daily activity pattern?
@@ -50,6 +51,8 @@ The mean number of steps per day is 10766.19
 ```r
 activity_by_interval <- group_by(activity, interval)
 mean_steps_by_interval <- summarise(activity_by_interval, meansteps=mean(steps))
+
+interval_with_max_steps <- mean_steps_by_interval$interval[which.max(mean_steps_by_interval$meansteps)]
 
 plot(mean_steps_by_interval$interval, mean_steps_by_interval$meansteps, 
      type="l",
@@ -60,10 +63,16 @@ plot(mean_steps_by_interval$interval, mean_steps_by_interval$meansteps,
 
 ![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
 
-
+The maximum number of steps occurred during 5-minute interval 835.
 
 ## Imputing missing values
 
+
+```r
+missing_count <- sum(is.na(raw_activity$steps))
+```
+
+There are 2304 missing values in the dataset.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?

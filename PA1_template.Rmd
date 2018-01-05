@@ -32,16 +32,19 @@ activity_by_day <- group_by(activity, date)
 steps_by_day <- summarise(activity_by_day, total=sum(steps))
 
 meansteps <- mean(steps_by_day$total)
+mediansteps <- median(steps_by_day$total)
 
 ```
 
-The mean number of steps per day is `r format(meansteps, scientific=FALSE)`
+The mean number of steps per day is `r format(meansteps, scientific=FALSE)`, and the median number of steps per day is `r format(mediansteps, scientific=FALSE)`.
 
 
 ## What is the average daily activity pattern?
 ```{r}
 activity_by_interval <- group_by(activity, interval)
 mean_steps_by_interval <- summarise(activity_by_interval, meansteps=mean(steps))
+
+interval_with_max_steps <- mean_steps_by_interval$interval[which.max(mean_steps_by_interval$meansteps)]
 
 plot(mean_steps_by_interval$interval, mean_steps_by_interval$meansteps, 
      type="l",
@@ -50,10 +53,15 @@ plot(mean_steps_by_interval$interval, mean_steps_by_interval$meansteps,
      main="Average Steps Taken during 5 minute interval")
 ```
 
-
+The maximum number of steps occurred during 5-minute interval `r interval_with_max_steps`.
 
 ## Imputing missing values
 
+```{r}
+missing_count <- sum(is.na(raw_activity$steps))
+```
+
+There are `r missing_count` missing values in the dataset.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?

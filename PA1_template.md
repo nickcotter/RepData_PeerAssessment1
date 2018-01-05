@@ -75,4 +75,37 @@ missing_count <- sum(is.na(raw_activity$steps))
 There are 2304 missing values in the dataset.
 
 
+```r
+imputeMissingValue <- function(steps, interval) {
+    imputedSteps <- NA
+    if (!is.na(steps))
+      imputedSteps <- steps
+    else 
+      imputedSteps <- mean_steps_by_interval[mean_steps_by_interval$interval == interval, "meansteps"]
+}
+
+imputed_data <- raw_activity
+imputed_data$imputed_steps <- as.numeric(mapply(imputeMissingValue, imputed_data$steps, imputed_data$interval))
+imputed_data$date <- as.Date(imputed_data$date)
+
+imputed_steps_per_day <- group_by(imputed_data, date)
+total_imputed_steps_per_day <- summarise(imputed_steps_per_day, totalsteps=sum(imputed_steps))
+
+hist(total_imputed_steps_per_day$totalsteps, 
+     xlab="Total # steps taken each day", 
+     ylab="Count", 
+     main="Total # steps taken each day",
+     col=3)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+
+```r
+imputed_mean_steps <- mean(total_imputed_steps_per_day$totalsteps)
+imputed_median_steps <- median(total_imputed_steps_per_day$totalsteps)
+```
+
+The mean number of steps per day is 10766.19, and the median number of steps per day is 10766.19.
+
 ## Are there differences in activity patterns between weekdays and weekends?

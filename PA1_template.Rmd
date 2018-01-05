@@ -1,8 +1,8 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
 output: 
-  html_document:
-    keep_md: true
+html_document:
+keep_md: true
 ---
 
 ## Use these libraries
@@ -51,6 +51,7 @@ plot(mean_steps_by_interval$interval, mean_steps_by_interval$meansteps,
      xlab="5 Minute Interval",
      ylab="Average Steps Taken/Interval",
      main="Average Steps Taken during 5 minute interval")
+
 ```
 
 The maximum number of steps occurred during 5-minute interval `r interval_with_max_steps`.
@@ -63,5 +64,36 @@ missing_count <- sum(is.na(raw_activity$steps))
 
 There are `r missing_count` missing values in the dataset.
 
+```{r}
+
+imputeMissingValue <- function(steps, interval) {
+  imputedSteps <- NA
+  if (!is.na(steps))
+    imputedSteps <- steps
+  else 
+    imputedSteps <- mean_steps_by_interval[mean_steps_by_interval$interval == interval, "meansteps"]
+}
+
+imputed_data <- raw_activity
+imputed_data$imputed_steps <- as.numeric(mapply(imputeMissingValue, imputed_data$steps, imputed_data$interval))
+imputed_data$date <- as.Date(imputed_data$date)
+
+imputed_steps_per_day <- group_by(imputed_data, date)
+total_imputed_steps_per_day <- summarise(imputed_steps_per_day, totalsteps=sum(imputed_steps))
+
+hist(total_imputed_steps_per_day$totalsteps, 
+     xlab="Total # steps taken each day", 
+     ylab="Count", 
+     main="Total # steps taken each day",
+     col=3)
+
+```
+
+```{r}
+imputed_mean_steps <- mean(total_imputed_steps_per_day$totalsteps)
+imputed_median_steps <- median(total_imputed_steps_per_day$totalsteps)
+```
+
+The mean number of steps per day is `r format(imputed_mean_steps, scientific=FALSE)`, and the median number of steps per day is `r format(imputed_median_steps, scientific=FALSE)`.
 
 ## Are there differences in activity patterns between weekdays and weekends?
